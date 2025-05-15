@@ -5,6 +5,7 @@ import com.github.katemerek.securitytokenproject.dto.MyUserDto;
 import com.github.katemerek.securitytokenproject.dto.MyUserDtoForGet;
 import com.github.katemerek.securitytokenproject.dto.MyUserResponse;
 import com.github.katemerek.securitytokenproject.exception.UserNotFoundException;
+import com.github.katemerek.securitytokenproject.exception.UsernameAlreadyExistsException;
 import com.github.katemerek.securitytokenproject.mapper.MyUserMapperForGet;
 import com.github.katemerek.securitytokenproject.model.MyUser;
 import com.github.katemerek.securitytokenproject.repository.MyUserRepository;
@@ -40,9 +41,9 @@ public class MyUserManagementService {
 
     @Transactional
     public MyUserResponse register(MyUserDto myUserDto) {
-        if (!myUserRepository.existsByUsername(myUserDto.getUsername())) {
-            throw new UsernameNotFoundException("User with username" + myUserDto.getUsername() + " not found");
-        } else {
+        if (myUserRepository.existsByUsername(myUserDto.getUsername())) {
+            throw new UsernameAlreadyExistsException(myUserDto.getUsername());
+        }else {
             MyUser myUser = new MyUser();
             myUser.setUsername(myUserDto.getUsername());
             myUser.setPassword(passwordEncoder.encode(myUserDto.getPassword()));
@@ -54,17 +55,17 @@ public class MyUserManagementService {
     }
 
     public LoginResponse login(MyUserDto myUserDto) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        myUserDto.getUsername(),
-                        myUserDto.getPassword()
-                ));
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            myUserDto.getUsername(),
+                            myUserDto.getPassword()
+                    ));
 
-        MyUser user = myUserRepository.findByUsername(myUserDto.getUsername()).orElseThrow(() -> new UsernameNotFoundException("User with username" + myUserDto.getUsername() + " not found"));
-        MyUserDetails userDetails = new MyUserDetails(user);
-        String jwt = jwtUtils.generateToken(userDetails);
-        String refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), userDetails);
-        return new LoginResponse(HttpStatus.OK, jwt, refreshToken, user.getRole().name(), "24Hrs", "Successfully logged in");
+            MyUser user = myUserRepository.findByUsername(myUserDto.getUsername()).orElseThrow(() -> new UsernameNotFoundException("User with username" + myUserDto.getUsername() + " not found"));
+            MyUserDetails userDetails = new MyUserDetails(user);
+            String jwt = jwtUtils.generateToken(userDetails);
+            String refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), userDetails);
+            return new LoginResponse(HttpStatus.OK, jwt, refreshToken, user.getRole().name(), "24Hrs", "Successfully logged in");
     }
 
     public LoginResponse refreshToken(LoginResponse refreshTokenRequest) throws UserNotFoundException {

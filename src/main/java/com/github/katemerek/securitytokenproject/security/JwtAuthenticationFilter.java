@@ -36,6 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Шаг 2: Проверка наличия заголовка авторизации
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
+            return;
         }
 
         // Шаг 3: Извлечение токена из заголовка

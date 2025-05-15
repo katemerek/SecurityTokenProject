@@ -22,7 +22,7 @@ public class JWTUtils {
     private static final long EXPIRATION_TIME = 86400000L;
 
     public JWTUtils(){
-        String secretString = "when will the good weather come";
+        String secretString = "EqjWQ7MYqS4VkF2vZLNOOH9r4XVa3XrIsibni4cJ6eEsAphTKHvnMoRmZdfC0PLD";
         byte[] keyBytes = Base64.getDecoder().decode(secretString.getBytes(StandardCharsets.UTF_8));
         this.secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
     }

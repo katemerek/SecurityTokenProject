@@ -24,9 +24,8 @@ public class MyUser {
     @Column(name = "password")
     private String password;
 
-    @Size(max = 30)
-    @NotBlank
-    @Column(name = "role")
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role")
     private Role role;
 
     @NotNull

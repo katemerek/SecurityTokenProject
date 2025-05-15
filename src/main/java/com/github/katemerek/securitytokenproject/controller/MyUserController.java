@@ -49,7 +49,7 @@ public class MyUserController {
         return ResponseEntity.ok(myUserManagementService.refreshToken(refreshTokenRequest));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/admin/{id}")
     public MyUserDtoForGet getUserById(@PathVariable Long id) {
         return myUserManagementService.getUserById(id);
     }

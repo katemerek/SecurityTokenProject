@@ -21,14 +21,14 @@ public class JWTUtils {
     // Время действия токена в миллисекундах (24 часа)  
     private static final long EXPIRATION_TIME = 86400000L;
 
-    public JWTUtils(){
+    public JWTUtils() {
         String secretString = "EqjWQ7MYqS4VkF2vZLNOOH9r4XVa3XrIsibni4cJ6eEsAphTKHvnMoRmZdfC0PLD";
         byte[] keyBytes = Base64.getDecoder().decode(secretString.getBytes(StandardCharsets.UTF_8));
         this.secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
     }
 
     /*Метод для генерации JWT токена на основе данных пользователя*/
-    public String generateToken(MyUserDetails myUserDetails){
+    public String generateToken(MyUserDetails myUserDetails) {
         return Jwts.builder()
                 .subject(myUserDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -37,8 +37,8 @@ public class JWTUtils {
                 .compact();
     }
 
-    // Метод для генерации токена обновления (refresh token) с дополнительными данными  
-    public String generateRefreshToken(HashMap<String, Object> claims, MyUserDetails myUserDetails){
+    // Метод для генерации токена обновления (refresh token)
+    public String generateRefreshToken(HashMap<String, Object> claims, MyUserDetails myUserDetails) {
         return Jwts.builder()
                 .claims(claims)
                 .subject(myUserDetails.getUsername())
@@ -58,7 +58,7 @@ public class JWTUtils {
                 (Jwts.parser()
                         .verifyWith(secretKey)
                         .build()
-                .parseSignedClaims(token)
+                        .parseSignedClaims(token)
                         .getPayload());
     }
 
@@ -67,7 +67,7 @@ public class JWTUtils {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-        private boolean isTokenExpired(String token) {
-            return extractClaims(token, Claims::getExpiration).before(new Date());
-        }
+    private boolean isTokenExpired(String token) {
+        return extractClaims(token, Claims::getExpiration).before(new Date());
+    }
 }

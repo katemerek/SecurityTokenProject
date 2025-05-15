@@ -1,6 +1,5 @@
 package com.github.katemerek.securitytokenproject.service;
 
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

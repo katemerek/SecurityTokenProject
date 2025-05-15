@@ -41,8 +41,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Шаг 3: Извлечение токена из заголовка
         jwtToken = authHeader.substring(7);
+
         // Шаг 4: Извлечение имени пользователя из JWT токена
         userNameFromToken = jwtUtils.extractUsername(jwtToken);
+
         // Шаг 5: Проверка аутентификации и валидация токена
         if (userNameFromToken != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             MyUserDetails userDetails = userDetailsService.loadUserByUsername(userNameFromToken);
@@ -50,10 +52,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken token =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 // Шаг 6: Создание нового контекста безопасности
                 SecurityContextHolder.getContext().setAuthentication(token);
             }
         }
+
         // Шаг 7: Передача запроса на дальнейшую обработку в фильтрующий цепочке
         filterChain.doFilter(request, response);
     }

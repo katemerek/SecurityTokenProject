@@ -32,12 +32,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        String username = obtainUsername(request); // Новый метод
-
-        if (username == null || username.isEmpty()) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         // Шаг 1: Извлечение заголовка авторизации из запроса
         final String authHeader = request.getHeader("Authorization");
         final String jwtToken;
@@ -70,26 +64,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Шаг 7: Передача запроса на дальнейшую обработку в фильтрующий цепочке
         filterChain.doFilter(request, response);
-    }
-
-    private String obtainUsername(HttpServletRequest request) {
-        // Для JSON запросов
-        if (request.getContentType() != null &&
-                request.getContentType().contains("application/json")) {
-
-            try {
-                // Чтение тела запроса
-                String body = request.getReader().lines()
-                        .collect(Collectors.joining());
-
-                JsonNode json = new ObjectMapper().readTree(body);
-                return json.path("username").asText();
-            } catch (Exception e) {
-                logger.warn("Failed to parse JSON", e);
-                return null;
-            }
-        }
-        // Для form-data
-        return request.getParameter("username");
     }
 }

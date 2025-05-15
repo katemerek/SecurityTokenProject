@@ -1,6 +1,7 @@
 package com.github.katemerek.securitytokenproject.config;
 
 import com.github.katemerek.securitytokenproject.security.JwtAuthenticationFilter;
+import com.github.katemerek.securitytokenproject.service.LoggingFilter;
 import com.github.katemerek.securitytokenproject.service.MyUserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +21,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final MyUserDetailService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final LoggingFilter loggingFilter;
 
-    public SecurityConfig(MyUserDetailService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(MyUserDetailService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter, LoggingFilter loggingFilter) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.loggingFilter = loggingFilter;
     }
 
     @Bean
@@ -36,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/moderator/**").hasAnyAuthority("MODERATOR")
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(loggingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();

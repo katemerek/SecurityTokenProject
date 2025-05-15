@@ -6,10 +6,13 @@ import com.github.katemerek.securitytokenproject.dto.MyUserDtoForGet;
 import com.github.katemerek.securitytokenproject.dto.MyUserResponse;
 import com.github.katemerek.securitytokenproject.exception.UserNotFoundException;
 import com.github.katemerek.securitytokenproject.model.MyUser;
+import com.github.katemerek.securitytokenproject.service.LoginAttemptService;
 import com.github.katemerek.securitytokenproject.service.MyUserManagementService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,9 +21,11 @@ import java.util.List;
 public class MyUserController {
 
     private final MyUserManagementService myUserManagementService;
+    private final LoginAttemptService loginAttemptService;
 
-    public MyUserController(MyUserManagementService myUserManagementService) {
+    public MyUserController(MyUserManagementService myUserManagementService, LoginAttemptService loginAttemptService) {
         this.myUserManagementService = myUserManagementService;
+        this.loginAttemptService = loginAttemptService;
     }
 
     @PutMapping("/moderator/update/{id}")
@@ -62,6 +67,15 @@ public class MyUserController {
     @DeleteMapping("/admin/delete/{id}")
     public void deleteUserById(@PathVariable Long id) {
         myUserManagementService.deleteUserById(id);
+    }
+    @GetMapping("/admin/locked")
+    public List<MyUserDtoForGet> getLockedAccounts() {
+        return loginAttemptService.getLockedUsers();
+    }
+
+    @PostMapping("/admin/{id}/unlock")
+    public ResponseEntity<MyUserResponse> unlockUser(@PathVariable Long id) {
+        return ResponseEntity.ok(loginAttemptService.unlockUser(id));
     }
 }
 
